@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use ink_lang as ink;
-use rand::{self, Rng};
+use rand::{self, Rng, thread_rng};
 
 #[ink::contract]
 mod chance {
@@ -43,8 +43,8 @@ mod chance {
 
         #[ink(message)]
         pub fn start_round(&mut self) {
-            let winner = self.choose_winner(&self.players);
-            winner.transfer(self.env().balance());
+            let winner = self.choose_winner();
+            self.transfer(winner, self.env().balance());
             self.last_winner = winner;
             self.round_count += 1;
             self.player_count = 0;
@@ -55,6 +55,12 @@ mod chance {
         #[ink(message)]
         pub fn choose_winner(&self) -> AccountId {
             self.players[rand::thread_rng().gen_range(0..self.players.len())]
+        }
+
+        /// Transfers the given amount to the given account.
+        #[ink(message)]
+        pub fn transfer(&mut self, to: AccountId, amount: Balance) {
+            self.env().transfer(to, amount).unwrap();
         }
 
         /// Getters
