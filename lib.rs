@@ -1,6 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use ink_lang as ink;
+use rand::{self, Rng};
 
 #[ink::contract]
 mod chance {
@@ -31,7 +32,7 @@ mod chance {
 
         /// A message that can be called on instantiated contracts.
         /// This one pushes the caller into the round players.
-        #[ink(message)]
+        #[ink(message, payable)]
         pub fn enter(&mut self) {
             self.players.push(self.env().caller());
             self.player_count += 1;
@@ -42,12 +43,18 @@ mod chance {
 
         #[ink(message)]
         pub fn start_round(&mut self) {
-            let winner = self.players[self.env().random() % self.players.len()];
+            let winner = self.choose_winner(&self.players);
             winner.transfer(self.env().balance());
             self.last_winner = winner;
             self.round_count += 1;
             self.player_count = 0;
             self.players = Vec::new();
+        }
+
+        /// Chooses a random winner from the round players.
+        #[ink(message)]
+        pub fn choose_winner(&self) -> AccountId {
+            self.players[rand::thread_rng().gen_range(0..self.players.len())]
         }
 
         /// Getters
