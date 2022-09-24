@@ -30,8 +30,7 @@ mod chance {
         }
 
         /// A message that can be called on instantiated contracts.
-        /// This one flips the value of the stored `bool` from `true`
-        /// to `false` and vice versa.
+        /// This one pushes the caller into the round players.
         #[ink(message)]
         pub fn enter(&mut self) {
             self.players.push(self.env().caller());
