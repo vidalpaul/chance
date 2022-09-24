@@ -1,0 +1,1 @@
+An automated lottery contract for Substrate-based smart contract platforms (such as Edgeware), built with ink! programming language.
